@@ -8,16 +8,6 @@ white: RGB (255,255,255) => L (255) => 1
 black: RGB (0,0,0) => L (0) => 0
 
 
-## Default image start, end point
-MIN_WIDTH = 76
-
-MAX_WIDTH = 464
-
-MIN_HEIGHT = 183
-
-MAX_HEIGHT = 678
-
-
 ##Installation
 ```sh
 $ git clone https://github.com/jicjjang/ImageFabric.git
