@@ -17,26 +17,27 @@ class Fabric(object):
 
     outline = None
 
-    def __init__(self, filepath, min_width=77, max_width=464, min_height=184, max_height=678):
+    def __init__(self, filepath, min_width=None, max_width=None, min_height=None, max_height=None):
         self.set_items(filepath, min_width, max_width, min_height, max_height)
         self.make_dir()
         self.image_to_binary()
         self.save_binary()
 
     def set_items(self, filepath, min_width, max_width, min_height, max_height):
-        self.min_width = min_width
-        self.max_width = max_width
-        self.min_height = min_height
-        self.max_height = max_height
-
         self.filepath = filepath
         self.filename = self.filepath.split(".")[0].split('/')[-1]
 
         self.convertImage = Image.open(self.filepath).convert('L')
-        self.openedFile = open('output.txt', 'w')
+        self.openedFile = open('output-' + self.filename + '.txt', 'w')
         self.convertImagePixel = self.convertImage.load()
+
         self.width = self.convertImage.width
         self.height = self.convertImage.height
+        self.min_width = min_width or 0
+        self.max_width = max_width or self.width
+        self.min_height = min_height or 0
+        self.max_height = max_height or self.height
+
         self.outline = [[1] * self.width for x in range(self.height)]
 
     def make_dir(self):
