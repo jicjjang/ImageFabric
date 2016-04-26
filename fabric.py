@@ -1,38 +1,55 @@
-from PIL import Image
+import os
 
-# white : (255,255,255) --> 1
-# black : (0,0,0) --> 0
+from PIL import Image
 
 
 class Fabric(object):
-    filename = None
+    filepath = None
     convertImage = None
     openedFile = None
     convertImagePixel = None
     width = None
     height = None
+    min_width = None
+    max_width = None
+    min_height = None
+    max_height = None
 
     outline = None
 
-    def __init__(self, filename):
-        self.set_items(filename)
-        self.outline_checker()
+    def __init__(self, filepath, min_width=77, max_width=464, min_height=184, max_height=678):
+        self.set_items(filepath, min_width, max_width, min_height, max_height)
+        self.make_dir()
+        self.image_to_binary()
         self.save_binary()
 
-    def set_items(self, filename):
-        self.filename = filename
-        self.convertImage = Image.open(self.filename).convert('L')
+    def set_items(self, filepath, min_width, max_width, min_height, max_height):
+        self.min_width = min_width
+        self.max_width = max_width
+        self.min_height = min_height
+        self.max_height = max_height
+
+        self.filepath = filepath
+        self.filename = self.filepath.split(".")[0].split('/')[-1]
+
+        self.convertImage = Image.open(self.filepath).convert('L')
         self.openedFile = open('output.txt', 'w')
         self.convertImagePixel = self.convertImage.load()
         self.width = self.convertImage.width
         self.height = self.convertImage.height
         self.outline = [[1] * self.width for x in range(self.height)]
 
-    def outline_checker(self):
+    def make_dir(self):
+        if not os.path.exists('img/create/' + self.filename + '/width'):
+            os.makedirs('img/create/' + self.filename + '/width')
+        if not os.path.exists('img/create/' + self.filename + '/height'):
+            os.makedirs('img/create/' + self.filename + '/height')
+
+    def image_to_binary(self):
         for i in range(self.height):
             for j in range(self.width):
-                if self.convertImagePixel[(j, i)] != 255:
-                    self.outline[i][j] = 2
+                if self.convertImagePixel[(j, i)] is not 255:
+                    self.outline[i][j] = 0
 
     def save_binary(self):
         for i in range(self.height):
@@ -40,22 +57,38 @@ class Fabric(object):
                 self.openedFile.write(str(self.outline[i][j]))
             self.openedFile.write('\n')
 
-    # def random_binary(self):
-    #     for i in range(self.height):
-    #         for j in range(self.width):
-    #             self.openedFile.write(str(self.outline[i][j]))
-    #         self.openedFile.write('\n')
+    def draw_pixel(self, img_width, img_height, count):
+        for i in range(self.min_height, self.max_height):
+            for j in range(self.min_width, self.max_width):
+                if self.outline[i][j] is 1 and count > j:
+                    img_width.putpixel((j, i), 255)
+                if self.outline[i][j] is 1 and count > i:
+                    img_height.putpixel((j, i), 255)
+            if count == self.height:
+                break
 
-    def save_image(self):
-        img = Image.new('L', (self.width, self.height), "white")
-        for i in range(self.height):
-            for j in range(self.width):
-                if self.convertImagePixel[(j, i)] is 2:
-                    img.putpixel((j, i), 1)
-        img.show()
+    def create_saved_binary_to_image(self):
+        count = min(self.min_width, self.min_height)
+        img_width = Image.new('L', (self.width, self.height), 1)
+        img_height = Image.new('L', (self.width, self.height), 1)
+
+        while (True):
+            self.draw_pixel(img_width, img_height, count)
+
+            if self.min_width < count < self.max_width:
+                img_width.save('img/create/' + self.filename + '/width/' + str(count) + '.png', "PNG")
+                print 'created width/' + str(count) + '.png file'
+            if self.min_height < count < self.max_height:
+                img_height.save('img/create/' + self.filename + '/height/' + str(count) + '.png', "PNG")
+                print 'created height/' + str(count) + '.png file'
+
+            count += 1
+            if count >= max(self.max_width, self.max_height):
+                break
 
 
 if __name__ == '__main__':
     pass
+
 else:
     pass
