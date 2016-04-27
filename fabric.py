@@ -5,6 +5,7 @@ from PIL import Image
 
 class Fabric(object):
     filepath = None
+    savepath = None
     convertImage = None
     openedFile = None
     convertImagePixel = None
@@ -17,8 +18,9 @@ class Fabric(object):
 
     outline = None
 
-    def __init__(self, filepath, min_width=None, max_width=None, min_height=None, max_height=None):
+    def __init__(self, filepath, min_width=None, max_width=None, min_height=None, max_height=None, savepath=None):
         self.filepath = filepath
+        self.savepath = savepath
         self.filename = self.filepath.split(".")[0].split('/')[-1]
         self.make_dir()
         self.set_items(min_width, max_width, min_height, max_height)
@@ -27,7 +29,7 @@ class Fabric(object):
 
     def set_items(self, min_width, max_width, min_height, max_height):
         self.convertImage = Image.open(self.filepath).convert('L')
-        self.openedFile = open('txt/output-' + self.filename + '.txt', 'w')
+        self.openedFile = open(self.savepath + 'txt/output-' + self.filename + '.txt', 'w')
         self.convertImagePixel = self.convertImage.load()
 
         self.width = self.convertImage.width
@@ -40,12 +42,16 @@ class Fabric(object):
         self.outline = [[1] * self.width for x in range(self.height)]
 
     def make_dir(self):
-        if not os.path.exists('txt'):
-            os.makedirs('txt')
-        if not os.path.exists('img/create/' + self.filename + '/width'):
-            os.makedirs('img/create/' + self.filename + '/width')
-        if not os.path.exists('img/create/' + self.filename + '/height'):
-            os.makedirs('img/create/' + self.filename + '/height')
+        if self.savepath is None:
+            self.savepath = ""
+        elif self.savepath[-1] is not '/':
+            self.savepath += "/"
+        if not os.path.exists(self.savepath + 'txt'):
+            os.makedirs(self.savepath + 'txt')
+        if not os.path.exists(self.savepath + 'img/create/' + self.filename + '/width'):
+            os.makedirs(self.savepath + 'img/create/' + self.filename + '/width')
+        if not os.path.exists(self.savepath + 'img/create/' + self.filename + '/height'):
+            os.makedirs(self.savepath + 'img/create/' + self.filename + '/height')
 
     def image_to_binary(self):
         for i in range(self.height):
@@ -78,11 +84,11 @@ class Fabric(object):
             self.draw_pixel(img_width, img_height, count)
 
             if self.min_width < count < self.max_width:
-                img_width.save('img/create/' + self.filename + '/width/' + str(count) + '.png', "PNG")
-                print 'created width/' + str(count) + '.png file'
+                img_width.save(self.savepath + 'img/create/' + self.filename + '/width/' + str(count) + '.png', "PNG")
+                print '[' + self.filename + '] created width/' + str(count) + '.png file'
             if self.min_height < count < self.max_height:
-                img_height.save('img/create/' + self.filename + '/height/' + str(count) + '.png', "PNG")
-                print 'created height/' + str(count) + '.png file'
+                img_height.save(self.savepath + 'img/create/' + self.filename + '/height/' + str(count) + '.png', "PNG")
+                print '[' + self.filename + '] created height/' + str(count) + '.png file'
 
             count += 1
             if count >= max(self.max_width, self.max_height):
