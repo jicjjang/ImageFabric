@@ -26,9 +26,10 @@ $ pip install Pillow
 |  ---        |  ---   | ---      |  ---                                              |
 | filepath    | String | Yes      | image input path                                  |
 | min_width   | int    | No       | (When the image crop) left point.                 |
-| max_width   | int    | No       | (When the image crop) left point.                 |
-| min_height  | int    | No       | (When the image crop) left point.                 |
-| max_height  | String | No       | (If you specify the image path) image save path.  |
+| max_width   | int    | No       | (When the image crop) right point.                |
+| min_height  | int    | No       | (When the image crop) top point.                  |
+| max_height  | int    | No       | (When the image crop) bottom point.               |
+| savepath    | String | No       | (If you specify the image path) image save path.  |
 
 ##### Example
 ```python
